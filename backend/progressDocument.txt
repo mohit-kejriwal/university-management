@@ -1,0 +1,176 @@
+# 📘 **University Management System – Progress Summary & Function Notes**
+
+## 🧱 Project Setup Overview
+
+### 🔹 Folder Structure (in `uniSystem/`)
+```
+/uniSystem/
+├── /frontend/     # React.js app (Vite)
+└── /backend/      # Node.js + Express.js server
+```
+
+---
+
+## ✅ Backend Setup Completed
+
+### ✔ Node Environment Setup:
+- Initialized project with `npm init -y`
+- Installed core dependencies:
+  ```bash
+  npm install express mongoose dotenv cors multer bcryptjs jsonwebtoken
+  ```
+
+### ✔ Backend Folder Structure:
+```
+/backend/
+├── /models/         # Mongoose schemas
+├── /routes/         # Express routes
+├── /controllers/    # Route logic handlers
+├── /middlewares/    # Auth & role checking
+├── /uploads/        # Assignment file storage
+├── .env             # Environment variables
+└── index.js         # Main app entry point
+```
+
+---
+
+## 🌐 MongoDB Setup
+
+- Using **local MongoDB** instance
+- `.env` file includes:
+  ```env
+  PORT=5000
+  MONGO_URI=mongodb://127.0.0.1:27017/uniSystemDB
+  JWT_SECRET=superSecretKey123
+  ```
+
+---
+
+## 🛠 Express Server Setup (`index.js`)
+- Created Express app and connected it to MongoDB
+- Middlewares:
+  - `express.json()` – to handle JSON requests
+  - `cors()` – to allow frontend connections
+  - Static serving from `/uploads` directory
+- Basic test route:
+  ```js
+  app.get('/', (req, res) => res.send('Backend working!'));
+  ```
+
+---
+
+## 🔐 Authentication & Role Management
+
+### ✅ User Model (`models/User.js`)
+Defines the structure of user accounts:
+```js
+{
+  name: String,
+  email: String (unique),
+  password: String (hashed),
+  role: 'student' | 'teacher' | 'admin'
+}
+```
+
+---
+
+### ✅ Auth Controller (`controllers/authController.js`)
+
+#### 🔹 `register` – Registers new users
+- Checks if user already exists
+- Hashes password with `bcryptjs`
+- Stores user in MongoDB
+
+#### 🔹 `login` – Logs in existing users
+- Validates email/password
+- Issues JWT token with `id` and `role` embedded
+
+---
+
+### ✅ Auth Routes (`routes/authRoutes.js`)
+```js
+POST /api/auth/register  → Register user  
+POST /api/auth/login     → Login and get JWT token
+```
+
+---
+
+## 🧱 Middleware for Security
+
+### ✅ `authMiddleware.js`
+- Checks if JWT token is valid
+- Adds `req.user` with decoded data
+
+```js
+req.user = {
+  id: 'userIdFromToken',
+  role: 'student' | 'teacher' | 'admin'
+}
+```
+
+### ✅ `roleMiddleware.js`
+- Restricts route access based on user role
+- Usage:
+  ```js
+  router.get('/adminOnly', authMiddleware, roleMiddleware('admin'), (req, res) => { ... });
+  ```
+
+---
+
+## ✅ Testing with Postman
+
+### Register Example:
+```json
+POST /api/auth/register
+{
+  "name": "Alice",
+  "email": "alice@edu.com",
+  "password": "123456",
+  "role": "teacher"
+}
+```
+
+### Login Example:
+```json
+POST /api/auth/login
+{
+  "email": "alice@edu.com",
+  "password": "123456"
+}
+```
+
+Response:
+```json
+{
+  "token": "jwtTokenHere",
+  "user": {
+    "id": "...",
+    "name": "Alice",
+    "role": "teacher"
+  }
+}
+```
+
+---
+
+## ✅ What’s Working So Far
+
+- ✅ Backend server with Express
+- ✅ Connected to **local MongoDB**
+- ✅ User **registration and login** with role support
+- ✅ **Password hashing** for security
+- ✅ **JWT token system** for authentication
+- ✅ **Route protection** using middleware
+
+---
+
+## 🔜 What's Next?
+
+We’re ready to move on to:
+1. **Subject & Timeline Management**
+   - Models: Subject, Timeline
+   - Admin can create subjects and assign teachers
+   - Teachers can upload timelines
+2. **Protected APIs** using `authMiddleware` and `roleMiddleware`
+3. **Start frontend login & routing system**
+
